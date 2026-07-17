@@ -1,0 +1,1 @@
+# smart-thermal-guardian
