@@ -1,0 +1,1411 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="theme-color" content="#060D1A">
+<title>Smart Thermal Guardian</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&family=JetBrains+Mono:wght@400;600&display=swap');
+
+:root {
+  --bg:    #060D1A;
+  --bg2:   #0A1628;
+  --panel: #0C1C30;
+  --blue:  #103A6E;
+  --lblue: #1B5FAD;
+  --cyan:  #00C8FF;
+  --white: #FFFFFF;
+  --gray:  #64748B;
+  --lgray: #94A3B8;
+  --or:    #F4840C;
+  --gn:    #16A34A;
+  --rd:    #DC2626;
+  --gold:  #F59E0B;
+  --r:12px;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior:smooth; }
+body {
+  background:var(--bg);
+  color:var(--white);
+  font-family:'Cairo',sans-serif;
+  overflow-x:hidden;
+}
+
+/* ══ SCROLLBAR ══ */
+::-webkit-scrollbar { width:5px; }
+::-webkit-scrollbar-track { background:var(--bg); }
+::-webkit-scrollbar-thumb { background:var(--blue); border-radius:3px; }
+
+/* ══ NAV ══ */
+nav {
+  position:fixed; top:0; left:0; right:0; z-index:1000;
+  background:rgba(6,13,26,.92);
+  backdrop-filter:blur(14px);
+  border-bottom:1px solid rgba(0,200,255,.1);
+  padding:0 28px;
+  display:flex; align-items:center; justify-content:space-between;
+  height:60px;
+}
+.nav-logo {
+  display:flex; align-items:center; gap:10px;
+  font-size:1.1rem; font-weight:900; letter-spacing:1px;
+  color:var(--white); text-decoration:none;
+}
+.nav-logo span { color:var(--cyan); }
+.logo-icon {
+  width:36px; height:36px;
+  background:linear-gradient(135deg,var(--blue),#0A1F40);
+  border:1.5px solid var(--cyan);
+  border-radius:8px;
+  display:flex; align-items:center; justify-content:center;
+  font-size:1rem;
+}
+.nav-links {
+  display:flex; gap:4px; list-style:none;
+}
+.nav-links a {
+  padding:6px 14px; border-radius:8px;
+  color:var(--lgray); text-decoration:none;
+  font-size:.82rem; font-weight:600;
+  transition:all .2s;
+}
+.nav-links a:hover, .nav-links a.active {
+  color:var(--cyan);
+  background:rgba(0,200,255,.07);
+}
+.nav-cta {
+  background:linear-gradient(135deg,var(--lblue),var(--blue));
+  color:var(--white) !important;
+  border:1px solid rgba(0,200,255,.3) !important;
+  padding:7px 18px !important;
+  border-radius:8px !important;
+}
+.nav-cta:hover { background:linear-gradient(135deg,#2070C0,#1A5090) !important; }
+
+/* mobile menu */
+.hamburger {
+  display:none; flex-direction:column; gap:5px; cursor:pointer;
+  background:none; border:none; padding:4px;
+}
+.hamburger span {
+  display:block; width:24px; height:2px;
+  background:var(--lgray); border-radius:2px;
+  transition:all .3s;
+}
+.mobile-menu {
+  display:none; position:fixed; top:60px; left:0; right:0;
+  background:rgba(6,13,26,.98); backdrop-filter:blur(14px);
+  border-bottom:1px solid rgba(0,200,255,.1);
+  padding:16px 24px; z-index:999;
+  flex-direction:column; gap:4px;
+}
+.mobile-menu a {
+  display:block; padding:10px 14px; border-radius:8px;
+  color:var(--lgray); text-decoration:none;
+  font-size:.9rem; font-weight:600;
+  transition:all .2s;
+}
+.mobile-menu a:hover { color:var(--cyan); background:rgba(0,200,255,.07); }
+
+/* ══ SECTIONS ══ */
+section { padding:90px 28px 60px; max-width:1100px; margin:0 auto; }
+section:first-of-type { padding-top:120px; }
+
+.sec-badge {
+  display:inline-flex; align-items:center; gap:6px;
+  background:rgba(0,200,255,.07);
+  border:1px solid rgba(0,200,255,.2);
+  border-radius:20px; padding:4px 14px;
+  font-size:.7rem; letter-spacing:2px; color:var(--cyan);
+  text-transform:uppercase; margin-bottom:16px;
+}
+.sec-title {
+  font-size:clamp(1.8rem,5vw,2.8rem);
+  font-weight:900; line-height:1.2;
+  margin-bottom:14px;
+}
+.sec-sub {
+  font-size:1rem; color:var(--lgray);
+  line-height:1.7; max-width:600px;
+  margin-bottom:40px;
+}
+
+/* ══ HERO ══ */
+#hero {
+  min-height:100vh;
+  display:flex; flex-direction:column;
+  justify-content:center;
+  padding-top:80px;
+  position:relative; overflow:hidden;
+  max-width:100%; margin:0; padding-left:6vw; padding-right:6vw;
+}
+.hero-bg {
+  position:absolute; inset:0; pointer-events:none;
+  background:radial-gradient(ellipse 70% 60% at 70% 40%, rgba(16,58,110,.35) 0%, transparent 70%),
+             radial-gradient(ellipse 40% 40% at 20% 80%, rgba(0,200,255,.06) 0%, transparent 60%);
+}
+.hero-grid {
+  display:grid; grid-template-columns:1fr 1fr;
+  gap:60px; align-items:center; position:relative;
+}
+.hero-tag {
+  display:inline-flex; align-items:center; gap:8px;
+  background:rgba(0,200,255,.06);
+  border:1px solid rgba(0,200,255,.18);
+  border-radius:20px; padding:5px 14px;
+  font-size:.72rem; letter-spacing:2px; color:var(--cyan);
+  text-transform:uppercase; margin-bottom:20px;
+}
+.hero-tag .dot {
+  width:6px; height:6px; border-radius:50%;
+  background:var(--cyan);
+  animation:pulse-dot 2s infinite;
+}
+@keyframes pulse-dot { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.4;transform:scale(.7)} }
+
+.hero-title {
+  font-size:clamp(2.2rem,5vw,3.8rem);
+  font-weight:900; line-height:1.15;
+  margin-bottom:20px;
+}
+.hero-title .grad {
+  background:linear-gradient(135deg,var(--cyan),#5BC8FF);
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+  background-clip:text;
+}
+.hero-desc {
+  font-size:1.02rem; color:var(--lgray);
+  line-height:1.75; margin-bottom:32px;
+  max-width:480px;
+}
+.hero-btns { display:flex; gap:12px; flex-wrap:wrap; }
+.btn-primary {
+  background:linear-gradient(135deg,var(--lblue),var(--blue));
+  color:var(--white); border:none; border-radius:10px;
+  padding:12px 26px; font-size:.9rem; font-weight:700;
+  cursor:pointer; font-family:'Cairo',sans-serif;
+  transition:all .2s; text-decoration:none; display:inline-block;
+  box-shadow:0 4px 20px rgba(0,100,200,.3);
+}
+.btn-primary:hover { transform:translateY(-2px); box-shadow:0 8px 28px rgba(0,100,200,.45); }
+.btn-outline {
+  background:transparent;
+  color:var(--cyan); border:1.5px solid rgba(0,200,255,.3);
+  border-radius:10px; padding:12px 26px;
+  font-size:.9rem; font-weight:700;
+  cursor:pointer; font-family:'Cairo',sans-serif;
+  transition:all .2s; text-decoration:none; display:inline-block;
+}
+.btn-outline:hover { background:rgba(0,200,255,.07); border-color:var(--cyan); }
+
+/* hero stats */
+.hero-stats {
+  display:flex; gap:24px; margin-top:36px; flex-wrap:wrap;
+}
+.hstat {
+  display:flex; flex-direction:column;
+}
+.hstat-val { font-size:1.6rem; font-weight:900; color:var(--cyan); font-family:'JetBrains Mono',monospace; }
+.hstat-lbl { font-size:.72rem; color:var(--gray); letter-spacing:1px; }
+
+/* hero visual (right side) */
+.hero-visual {
+  position:relative; display:flex;
+  align-items:center; justify-content:center;
+}
+.device-mockup {
+  width:100%; max-width:380px;
+  background:linear-gradient(135deg,#0C1C30,#071220);
+  border:1.5px solid rgba(0,200,255,.2);
+  border-radius:18px;
+  padding:20px;
+  box-shadow:0 20px 60px rgba(0,0,0,.5), 0 0 40px rgba(0,200,255,.08);
+  position:relative; overflow:hidden;
+}
+.device-mockup::before {
+  content:'';
+  position:absolute; top:0; left:0; right:0; height:2px;
+  background:linear-gradient(90deg,transparent,var(--cyan),transparent);
+}
+.dm-header {
+  display:flex; align-items:center; justify-content:space-between;
+  margin-bottom:16px;
+}
+.dm-title { font-size:.75rem; color:var(--cyan); font-weight:700; letter-spacing:1px; }
+.dm-status {
+  display:flex; align-items:center; gap:5px;
+  font-size:.68rem; color:var(--gn);
+}
+.live-dot {
+  width:7px; height:7px; border-radius:50%; background:var(--gn);
+  animation:pulse-dot 1.5s infinite;
+}
+
+/* oled in mockup */
+.oled-mock {
+  background:#000; border:1.5px solid #1a2a1a;
+  border-radius:6px; padding:10px 12px;
+  font-family:'JetBrains Mono',monospace;
+  font-size:9.5px; line-height:1.85;
+  margin-bottom:14px;
+}
+.ol { color:#00DD44; display:block; }
+.ol.w { color:#FFCC00; }
+
+/* sensor grid in mockup */
+.sensor-mini-grid {
+  display:grid; grid-template-columns:1fr 1fr;
+  gap:6px;
+}
+.smg-card {
+  background:rgba(0,200,255,.04);
+  border:1px solid rgba(0,200,255,.1);
+  border-radius:8px; padding:8px 10px;
+}
+.smg-label { font-size:.6rem; color:var(--gray); margin-bottom:3px; }
+.smg-val {
+  font-size:.9rem; font-weight:700;
+  font-family:'JetBrains Mono',monospace;
+}
+.smg-val.ok   { color:var(--gn); }
+.smg-val.warn { color:var(--or); }
+.smg-val.danger { color:var(--rd); }
+
+/* relay strip */
+.relay-strip {
+  display:flex; gap:6px; margin-top:10px;
+}
+.relay-pill {
+  flex:1; text-align:center; padding:5px;
+  border-radius:6px; font-size:.68rem; font-weight:700;
+}
+.relay-pill.on  { background:rgba(22,163,74,.15); color:var(--gn); border:1px solid rgba(22,163,74,.25); }
+.relay-pill.off { background:rgba(100,116,139,.08); color:var(--gray); border:1px solid rgba(100,116,139,.15); }
+
+/* ══ PROBLEMS SECTION ══ */
+.problems-grid {
+  display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr));
+  gap:16px;
+}
+.prob-card {
+  background:var(--panel);
+  border:1px solid rgba(255,255,255,.06);
+  border-radius:var(--r); padding:22px;
+  position:relative; overflow:hidden;
+  transition:all .25s;
+}
+.prob-card:hover { transform:translateY(-4px); box-shadow:0 12px 30px rgba(0,0,0,.3); }
+.prob-card::before {
+  content:''; position:absolute; top:0; left:0; right:0; height:2px;
+}
+.prob-card.red::before  { background:var(--rd); }
+.prob-card.or::before   { background:var(--or); }
+.prob-card.gold::before { background:var(--gold); }
+.prob-card.cyan::before { background:var(--cyan); }
+
+.prob-icon { font-size:2rem; margin-bottom:12px; display:block; }
+.prob-title { font-size:1rem; font-weight:700; margin-bottom:8px; }
+.prob-desc { font-size:.8rem; color:var(--lgray); line-height:1.65; }
+.prob-stat {
+  margin-top:14px; padding-top:12px;
+  border-top:1px solid rgba(255,255,255,.06);
+  font-size:1.4rem; font-weight:900;
+  font-family:'JetBrains Mono',monospace;
+}
+.prob-stat.red  { color:var(--rd); }
+.prob-stat.or   { color:var(--or); }
+.prob-stat.gold { color:var(--gold); }
+.prob-stat.cyan { color:var(--cyan); }
+.prob-stat-lbl { font-size:.68rem; color:var(--gray); font-family:'Cairo',sans-serif; font-weight:400; }
+
+/* ══ SOLUTION SECTION ══ */
+#solution { background:linear-gradient(180deg,var(--bg),#071220,var(--bg)); max-width:100%; }
+#solution > * { max-width:1100px; margin-left:auto; margin-right:auto; }
+.solution-inner { padding:0 28px; }
+
+.sol-grid {
+  display:grid; grid-template-columns:1fr 1fr;
+  gap:40px; align-items:start;
+}
+.sol-steps { display:flex; flex-direction:column; gap:14px; }
+.sol-step {
+  display:flex; gap:14px; align-items:flex-start;
+  background:var(--panel);
+  border:1px solid rgba(255,255,255,.06);
+  border-radius:var(--r); padding:16px;
+  transition:all .25s;
+}
+.sol-step:hover { border-color:rgba(0,200,255,.2); }
+.sol-step-num {
+  width:38px; height:38px; flex-shrink:0;
+  border-radius:10px; display:flex; align-items:center; justify-content:center;
+  font-size:1rem; font-weight:900; font-family:'JetBrains Mono',monospace;
+}
+.sol-step-title { font-size:.9rem; font-weight:700; margin-bottom:4px; }
+.sol-step-desc  { font-size:.78rem; color:var(--lgray); line-height:1.6; }
+
+/* alert table */
+.alert-table {
+  width:100%; border-collapse:collapse;
+  font-size:.75rem;
+}
+.alert-table th {
+  background:var(--blue);
+  padding:9px 12px; text-align:right;
+  font-weight:700; font-size:.68rem; letter-spacing:.5px;
+}
+.alert-table th:first-child { border-radius:0 8px 0 0; }
+.alert-table th:last-child  { border-radius:8px 0 0 0; }
+.alert-table td {
+  padding:8px 12px;
+  border-bottom:1px solid rgba(255,255,255,.04);
+}
+.alert-table tr:hover td { background:rgba(255,255,255,.02); }
+.badge-sm {
+  display:inline-block; padding:2px 8px; border-radius:10px;
+  font-size:.62rem; font-weight:700;
+}
+.bg-rd  { background:rgba(220,38,38,.15); color:var(--rd); border:1px solid rgba(220,38,38,.25); }
+.bg-or  { background:rgba(244,132,12,.15); color:var(--or); border:1px solid rgba(244,132,12,.25); }
+.bg-gn  { background:rgba(22,163,74,.15);  color:var(--gn); border:1px solid rgba(22,163,74,.25); }
+.bg-cy  { background:rgba(0,200,255,.1);   color:var(--cyan); border:1px solid rgba(0,200,255,.2); }
+
+/* ══ DASHBOARD ══ */
+#dashboard { background:var(--bg2); max-width:100%; padding:60px 28px; }
+.dash-inner { max-width:1100px; margin:0 auto; }
+.dash-title-row {
+  display:flex; align-items:center; justify-content:space-between;
+  margin-bottom:24px; flex-wrap:wrap; gap:12px;
+}
+.dash-live {
+  display:flex; align-items:center; gap:6px;
+  font-size:.75rem; color:var(--gn);
+}
+
+/* scenario bar */
+.scenario-bar {
+  display:flex; gap:6px; flex-wrap:wrap; margin-bottom:22px;
+}
+.sc-btn {
+  padding:6px 14px; border-radius:20px;
+  border:1px solid rgba(255,255,255,.1);
+  background:transparent; color:var(--gray);
+  font-family:'Cairo',sans-serif; font-size:.75rem;
+  cursor:pointer; transition:all .2s; white-space:nowrap;
+}
+.sc-btn:hover,.sc-btn.active {
+  border-color:var(--cyan); color:var(--cyan);
+  background:rgba(0,200,255,.07);
+}
+
+/* KPI cards */
+.kpi-grid {
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(160px,1fr));
+  gap:12px; margin-bottom:20px;
+}
+.kpi-card {
+  background:var(--panel);
+  border:1px solid rgba(255,255,255,.06);
+  border-radius:var(--r); padding:16px;
+  position:relative; overflow:hidden;
+  transition:border-color .3s;
+}
+.kpi-card.alert { border-color:rgba(220,38,38,.4); animation:kpi-blink 1s infinite; }
+.kpi-card.warn  { border-color:rgba(244,132,12,.4); }
+@keyframes kpi-blink { 0%,100%{border-color:rgba(220,38,38,.4)} 50%{border-color:rgba(220,38,38,.8)} }
+.kpi-label { font-size:.65rem; color:var(--gray); letter-spacing:.5px; margin-bottom:6px; }
+.kpi-val {
+  font-size:1.5rem; font-weight:900;
+  font-family:'JetBrains Mono',monospace; line-height:1;
+  margin-bottom:4px;
+}
+.kpi-unit { font-size:.65rem; color:var(--gray); }
+.kpi-icon { position:absolute; top:12px; left:12px; font-size:1.1rem; opacity:.4; }
+
+/* main dash grid */
+.dash-main {
+  display:grid; grid-template-columns:1fr 1fr 1fr;
+  gap:14px;
+}
+@media(max-width:900px){ .dash-main { grid-template-columns:1fr 1fr; } }
+@media(max-width:580px){ .dash-main { grid-template-columns:1fr; } }
+
+.dash-card {
+  background:var(--panel);
+  border:1px solid rgba(255,255,255,.06);
+  border-radius:var(--r); padding:18px;
+}
+.dash-card-title {
+  font-size:.72rem; color:var(--cyan);
+  letter-spacing:1.5px; text-transform:uppercase;
+  margin-bottom:14px; display:flex; align-items:center; gap:6px;
+}
+.dash-card-title::after { content:''; flex:1; height:1px; background:rgba(255,255,255,.06); }
+
+/* OLED in dashboard */
+.oled-big {
+  background:#000; border:2px solid #0D2010;
+  border-radius:8px; padding:12px 14px;
+  font-family:'JetBrains Mono',monospace;
+  font-size:11px; line-height:1.9;
+}
+.oled-big .ol  { color:#00DD44; display:block; }
+.oled-big .ow  { color:#FFCC00; }
+
+/* relay control */
+.relay-controls { display:flex; flex-direction:column; gap:8px; }
+.rc-row {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:10px 12px;
+  background:rgba(255,255,255,.03);
+  border:1px solid rgba(255,255,255,.06);
+  border-radius:8px;
+}
+.rc-label { font-size:.78rem; color:var(--lgray); }
+.rc-badge {
+  padding:3px 12px; border-radius:10px;
+  font-size:.7rem; font-weight:700;
+  transition:all .3s;
+}
+.rc-on  { background:rgba(22,163,74,.15);  color:var(--gn);  border:1px solid rgba(22,163,74,.3); }
+.rc-off { background:rgba(100,116,139,.08);color:var(--gray); border:1px solid rgba(100,116,139,.15); }
+
+/* mini chart */
+.mini-chart {
+  display:flex; align-items:flex-end; gap:3px;
+  height:60px; margin-top:8px;
+}
+.mini-bar {
+  flex:1; border-radius:3px 3px 0 0;
+  background:linear-gradient(0deg,var(--blue),var(--cyan));
+  transition:height .5s ease;
+  min-height:4px;
+}
+
+/* telegram log */
+.tg-log {
+  display:flex; flex-direction:column; gap:6px;
+  max-height:180px; overflow-y:auto;
+}
+.tg-msg {
+  background:rgba(0,200,255,.04);
+  border:1px solid rgba(0,200,255,.1);
+  border-radius:8px; padding:8px 10px;
+  font-size:.72rem; color:var(--lgray); line-height:1.5;
+}
+.tg-msg .tg-time { color:var(--cyan); font-family:'JetBrains Mono',monospace; font-size:.62rem; }
+.tg-msg .tg-type { font-weight:700; }
+
+/* status bar full */
+#status-bar {
+  padding:12px 18px; border-radius:var(--r);
+  font-size:.85rem; font-weight:700; text-align:center;
+  margin-bottom:20px; transition:all .4s;
+}
+#status-bar.ok     { background:rgba(22,163,74,.08); color:var(--gn);  border:1px solid rgba(22,163,74,.2); }
+#status-bar.warn   { background:rgba(244,132,12,.08);color:var(--or);  border:1px solid rgba(244,132,12,.2); }
+#status-bar.danger { background:rgba(220,38,38,.08); color:var(--rd);  border:1px solid rgba(220,38,38,.2);
+  animation:blink-border 1s infinite; }
+@keyframes blink-border { 0%,100%{border-color:rgba(220,38,38,.2)} 50%{border-color:rgba(220,38,38,.8)} }
+
+/* ══ SPECS SECTION ══ */
+.specs-grid {
+  display:grid; grid-template-columns:1fr 1fr;
+  gap:14px;
+}
+@media(max-width:650px){ .specs-grid { grid-template-columns:1fr; } }
+.spec-card {
+  background:var(--panel); border:1px solid rgba(255,255,255,.06);
+  border-radius:var(--r); padding:20px; overflow:hidden;
+}
+.spec-card-title {
+  font-size:.72rem; font-weight:700; letter-spacing:1.5px;
+  text-transform:uppercase; color:var(--cyan); margin-bottom:14px;
+}
+.spec-row {
+  display:flex; justify-content:space-between; align-items:center;
+  padding:7px 0; border-bottom:1px solid rgba(255,255,255,.04);
+  font-size:.8rem;
+}
+.spec-row:last-child { border:none; }
+.spec-key { color:var(--gray); }
+.spec-val { font-family:'JetBrains Mono',monospace; font-size:.75rem; color:var(--white); }
+.spec-val.cy { color:var(--cyan); }
+.spec-val.gn { color:var(--gn); }
+.spec-val.or { color:var(--or); }
+
+/* ══ MARKET SECTION ══ */
+.market-grid {
+  display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr));
+  gap:14px; margin-bottom:28px;
+}
+.mkt-card {
+  background:var(--panel); border:1px solid rgba(255,255,255,.06);
+  border-radius:var(--r); padding:20px; text-align:center;
+  transition:all .25s;
+}
+.mkt-card:hover { transform:translateY(-3px); border-color:rgba(0,200,255,.2); }
+.mkt-num {
+  font-size:1.8rem; font-weight:900;
+  font-family:'JetBrains Mono',monospace;
+  margin-bottom:6px;
+}
+.mkt-label { font-size:.78rem; color:var(--lgray); }
+.mkt-sub   { font-size:.68rem; color:var(--gray); margin-top:4px; }
+
+/* financial bars */
+.fin-grid { display:flex; flex-direction:column; gap:10px; }
+.fin-row { display:flex; align-items:center; gap:12px; }
+.fin-year { font-size:.72rem; color:var(--gray); width:40px; flex-shrink:0; font-family:'JetBrains Mono',monospace; }
+.fin-bar-wrap { flex:1; background:rgba(255,255,255,.05); border-radius:4px; height:28px; position:relative; overflow:hidden; }
+.fin-bar { height:100%; border-radius:4px; position:absolute; top:0; right:0; transition:width 1s ease; }
+.fin-bar.rev { background:linear-gradient(90deg,var(--lblue),var(--cyan)); }
+.fin-bar.net { background:linear-gradient(90deg,var(--gn),#40F080); }
+.fin-val { font-size:.72rem; color:var(--lgray); width:80px; text-align:left; font-family:'JetBrains Mono',monospace; flex-shrink:0; }
+
+/* ══ CONTACT SECTION ══ */
+#contact { background:var(--bg2); max-width:100%; padding:60px 28px; }
+.contact-inner { max-width:1100px; margin:0 auto; }
+.contact-grid {
+  display:grid; grid-template-columns:1fr 1fr;
+  gap:40px; align-items:start;
+}
+@media(max-width:700px){ .contact-grid { grid-template-columns:1fr; } }
+.contact-info { display:flex; flex-direction:column; gap:14px; }
+.ci-item {
+  display:flex; gap:12px; align-items:flex-start;
+  background:var(--panel); border:1px solid rgba(255,255,255,.06);
+  border-radius:var(--r); padding:14px;
+}
+.ci-icon { font-size:1.2rem; flex-shrink:0; margin-top:2px; }
+.ci-label { font-size:.68rem; color:var(--gray); margin-bottom:2px; letter-spacing:.5px; }
+.ci-val   { font-size:.85rem; color:var(--white); font-weight:600; }
+
+/* contact form */
+.contact-form { display:flex; flex-direction:column; gap:12px; }
+.form-group { display:flex; flex-direction:column; gap:5px; }
+.form-label { font-size:.72rem; color:var(--lgray); letter-spacing:.5px; }
+.form-input, .form-textarea {
+  background:rgba(255,255,255,.04);
+  border:1px solid rgba(255,255,255,.1);
+  border-radius:8px; padding:10px 14px;
+  color:var(--white); font-family:'Cairo',sans-serif; font-size:.85rem;
+  transition:border-color .2s; outline:none; width:100%;
+}
+.form-input:focus, .form-textarea:focus { border-color:var(--cyan); }
+.form-textarea { resize:vertical; min-height:100px; }
+.form-submit {
+  background:linear-gradient(135deg,var(--lblue),var(--blue));
+  color:var(--white); border:none; border-radius:10px;
+  padding:12px 28px; font-size:.9rem; font-weight:700;
+  cursor:pointer; font-family:'Cairo',sans-serif; transition:all .2s;
+  align-self:flex-start;
+}
+.form-submit:hover { transform:translateY(-2px); box-shadow:0 8px 24px rgba(0,100,200,.4); }
+
+/* ══ FOOTER ══ */
+footer {
+  background:var(--bg); border-top:1px solid rgba(255,255,255,.06);
+  padding:32px 28px; text-align:center;
+}
+.footer-logo { font-size:1.1rem; font-weight:900; letter-spacing:1px; margin-bottom:8px; }
+.footer-logo span { color:var(--cyan); }
+.footer-sub { font-size:.75rem; color:var(--gray); margin-bottom:18px; }
+.footer-links { display:flex; justify-content:center; gap:20px; flex-wrap:wrap; margin-bottom:18px; }
+.footer-links a { font-size:.78rem; color:var(--gray); text-decoration:none; transition:color .2s; }
+.footer-links a:hover { color:var(--cyan); }
+.footer-copy { font-size:.7rem; color:rgba(100,116,139,.5); }
+
+/* ══ RESPONSIVE ══ */
+@media(max-width:800px){
+  .hero-grid { grid-template-columns:1fr; }
+  .hero-visual { display:none; }
+  .sol-grid { grid-template-columns:1fr; }
+  nav .nav-links { display:none; }
+  .hamburger { display:flex; }
+}
+@media(max-width:600px){
+  section { padding:80px 18px 40px; }
+  .hero-title { font-size:2rem; }
+}
+
+/* ══ ANIMATIONS ══ */
+.fade-in {
+  opacity:0; transform:translateY(20px);
+  transition:opacity .6s ease, transform .6s ease;
+}
+.fade-in.visible { opacity:1; transform:translateY(0); }
+</style>
+</head>
+<body>
+
+<!-- ══ NAV ══ -->
+<nav>
+  <a class="nav-logo" href="#hero">
+    <div class="logo-icon">🛡️</div>
+    PYRO<span>SENSOR</span>
+  </a>
+  <ul class="nav-links">
+    <li><a href="#hero">الرئيسية</a></li>
+    <li><a href="#problems">المشكلة</a></li>
+    <li><a href="#solution">الحل</a></li>
+    <li><a href="#dashboard">Dashboard</a></li>
+    <li><a href="#specs">المواصفات</a></li>
+    <li><a href="#market">السوق</a></li>
+    <li><a href="#contact" class="nav-cta">تواصل معنا</a></li>
+  </ul>
+  <button class="hamburger" onclick="toggleMenu()" id="ham">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+<div class="mobile-menu" id="mmenu">
+  <a href="#hero" onclick="closeMenu()">الرئيسية</a>
+  <a href="#problems" onclick="closeMenu()">المشكلة</a>
+  <a href="#solution" onclick="closeMenu()">الحل</a>
+  <a href="#dashboard" onclick="closeMenu()">Dashboard</a>
+  <a href="#specs" onclick="closeMenu()">المواصفات</a>
+  <a href="#market" onclick="closeMenu()">السوق</a>
+  <a href="#contact" onclick="closeMenu()">تواصل معنا</a>
+</div>
+
+<!-- ══ HERO ══ -->
+<div id="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-grid">
+    <div class="fade-in">
+      <div class="hero-tag"><div class="dot"></div>نظام مراقبة ذكي</div>
+      <h1 class="hero-title">
+        حماية خزانات الوقود<br>
+        <span class="grad">بالذكاء الاصطناعي</span>
+      </h1>
+      <p class="hero-desc">
+        Smart Thermal Guardian — نظام IoT متكامل يراقب الحرارة، الضغط، الغازات القابلة للاشتعال، وتسرب السوائل في الوقت الحقيقي، مع استجابة تلقائية فورية وتنبيهات على Telegram.
+      </p>
+      <div class="hero-btns">
+        <a href="#dashboard" class="btn-primary">🔴 شاهد Dashboard الحي</a>
+        <a href="#solution" class="btn-outline">اكتشف الحل ←</a>
+      </div>
+      <div class="hero-stats">
+        <div class="hstat"><span class="hstat-val">< 2s</span><span class="hstat-lbl">وقت الاستجابة</span></div>
+        <div class="hstat"><span class="hstat-val">8K</span><span class="hstat-lbl">DZD / وحدة</span></div>
+        <div class="hstat"><span class="hstat-val">12/12</span><span class="hstat-lbl">اختبار اجتاز</span></div>
+        <div class="hstat"><span class="hstat-val">66.5M</span><span class="hstat-lbl">DZD سوق</span></div>
+      </div>
+    </div>
+    <div class="hero-visual fade-in">
+      <div class="device-mockup">
+        <div class="dm-header">
+          <span class="dm-title">SMART THERMAL GUARDIAN</span>
+          <span class="dm-status"><div class="live-dot"></div>LIVE</span>
+        </div>
+        <div class="oled-mock">
+          <span class="ol" id="h-ol1">0:00 PIR:No</span>
+          <span class="ol" id="h-ol2">T:28.3C H:52%</span>
+          <span class="ol" id="h-ol3">Gas:270 W:OK</span>
+          <span class="ol w" id="h-ol4">All Good :)</span>
+        </div>
+        <div class="sensor-mini-grid">
+          <div class="smg-card">
+            <div class="smg-label">🌡️ الحرارة</div>
+            <div class="smg-val ok" id="h-temp">28.3°C</div>
+          </div>
+          <div class="smg-card">
+            <div class="smg-label">💨 الغاز</div>
+            <div class="smg-val ok" id="h-gas">270</div>
+          </div>
+          <div class="smg-card">
+            <div class="smg-label">💧 الماء</div>
+            <div class="smg-val ok" id="h-water">متوفر</div>
+          </div>
+          <div class="smg-card">
+            <div class="smg-label">🌀 الضغط</div>
+            <div class="smg-val ok" id="h-pres">1013 hPa</div>
+          </div>
+        </div>
+        <div class="relay-strip">
+          <div class="relay-pill off" id="h-pump">💧 مضخة OFF</div>
+          <div class="relay-pill off" id="h-fan">🌀 مروحة OFF</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ PROBLEMS ══ -->
+<section id="problems">
+  <div class="sec-badge">⚠️ المشكلة</div>
+  <h2 class="sec-title">4 مخاطر حقيقية بدون حل</h2>
+  <p class="sec-sub">خزانات الوقود في الجزائر تواجه تهديدات يومية لا يوجد نظام محلي بأسعار معقولة لمراقبتها.</p>
+  <div class="problems-grid fade-in">
+    <div class="prob-card red">
+      <span class="prob-icon">🌡️</span>
+      <div class="prob-title">ارتفاع درجة الحرارة</div>
+      <div class="prob-desc">درجات حرارة الجزائر تتجاوز 40°C صيفاً مما يرفع ضغط غاز LPG لمستويات خطيرة بدون أي إنذار.</div>
+      <div class="prob-stat red">+40°C<br><span class="prob-stat-lbl">حرارة صيفية قياسية</span></div>
+    </div>
+    <div class="prob-card or">
+      <span class="prob-icon">🔴</span>
+      <div class="prob-title">ارتفاع الضغط الجوي</div>
+      <div class="prob-desc">تغيرات الضغط تؤثر على سلوك الغاز داخل الخزانات وتسرّع تآكل الصمامات دون أي رصد.</div>
+      <div class="prob-stat or">52°C<br><span class="prob-stat-lbl">الحد الآمن لـ LPG</span></div>
+    </div>
+    <div class="prob-card gold">
+      <span class="prob-icon">💥</span>
+      <div class="prob-title">خطر الغازات القابلة للاشتعال</div>
+      <div class="prob-desc">تسربات LPG والميثان والهيدروجين غير مرئية وتصل للمستوى الانفجاري في دقائق بدون كشف فوري.</div>
+      <div class="prob-stat gold">3,000+<br><span class="prob-stat-lbl">نقطة توزيع نفطال بدون مراقبة</span></div>
+    </div>
+    <div class="prob-card cyan">
+      <span class="prob-icon">💧</span>
+      <div class="prob-title">تسرب الماء والغاز</div>
+      <div class="prob-desc">تسربات صغيرة في نظام التبريد أو الوصلات تمر دون اكتشاف لساعات مما يُنشئ بيئة انفجارية.</div>
+      <div class="prob-stat cyan">0<br><span class="prob-stat-lbl">نظام إنذار محلي بأسعار معقولة</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ SOLUTION ══ -->
+<section id="solution" style="max-width:100%; background:linear-gradient(180deg,var(--bg) 0%,#071220 50%,var(--bg) 100%); padding:80px 0;">
+<div style="max-width:1100px; margin:0 auto; padding:0 28px;">
+  <div class="sec-badge">✅ الحل</div>
+  <h2 class="sec-title">Smart Thermal Guardian</h2>
+  <p class="sec-sub">نظام IoT متكامل يحل المشاكل الأربعة في آنٍ واحد بتكلفة لا تتجاوز 7,800 DZD.</p>
+  <div class="sol-grid fade-in">
+    <div class="sol-steps">
+      <div class="sol-step">
+        <div class="sol-step-num" style="background:rgba(0,200,255,.15);color:var(--cyan);">1</div>
+        <div>
+          <div class="sol-step-title">يستشعر — 5 مستشعرات دائمة</div>
+          <div class="sol-step-desc">DHT22 للحرارة والرطوبة، BMP280 للضغط، MQ-2 للغاز، PIR للحركة، Water Sensor للتسرب — كل 2 ثانية.</div>
+        </div>
+      </div>
+      <div class="sol-step">
+        <div class="sol-step-num" style="background:rgba(244,132,12,.15);color:var(--or);">2</div>
+        <div>
+          <div class="sol-step-title">يحلل — ESP32-S 240MHz</div>
+          <div class="sol-step-desc">يقارن القراءات مع حدود الأمان ويحدد مستوى الخطر في أقل من 10ms.</div>
+        </div>
+      </div>
+      <div class="sol-step">
+        <div class="sol-step-num" style="background:rgba(220,38,38,.15);color:var(--rd);">3</div>
+        <div>
+          <div class="sol-step-title">ينبّه — LED + Buzzer + OLED</div>
+          <div class="sol-step-desc">إنذار بصري وصوتي فوري. شاشة OLED تعرض الحالة الكاملة. كل ذلك خلال أقل من 50ms.</div>
+        </div>
+      </div>
+      <div class="sol-step">
+        <div class="sol-step-num" style="background:rgba(22,163,74,.15);color:var(--gn);">4</div>
+        <div>
+          <div class="sol-step-title">يبرّد — مضخة ذكية أو مروحة إسفنج</div>
+          <div class="sol-step-desc">إذا الماء متوفر: المضخة تعمل. إذا الخزان فارغ: المروحة + الإسفنج تستلم. النظام لا يفشل أبداً.</div>
+        </div>
+      </div>
+      <div class="sol-step">
+        <div class="sol-step-num" style="background:rgba(0,200,255,.15);color:var(--cyan);">5</div>
+        <div>
+          <div class="sol-step-title">يُبلّغ — Telegram لك وللمشرف</div>
+          <div class="sol-step-desc">تنبيه فوري عبر WiFi لكلا الهاتفين في أقل من 7 ثوانٍ مع تفاصيل كاملة عن الخطر.</div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div style="background:var(--panel);border:1px solid rgba(255,255,255,.06);border-radius:var(--r);padding:20px;">
+        <div style="font-size:.72rem;color:var(--cyan);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:14px;">منطق الاستجابة الكامل</div>
+        <table class="alert-table">
+          <thead>
+            <tr>
+              <th>الحالة</th>
+              <th>LED</th>
+              <th>تبريد</th>
+              <th>Telegram</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>عادي</td><td><span class="badge-sm bg-gn">🟢 أخضر</span></td><td>OFF</td><td>لا</td></tr>
+            <tr><td>تحذير حرارة + ماء</td><td><span class="badge-sm bg-cy">🔵 أزرق</span></td><td>مضخة ON</td><td>60s</td></tr>
+            <tr><td>تحذير حرارة + لا ماء</td><td><span class="badge-sm bg-cy">🔵 أزرق</span></td><td>مروحة ON</td><td>60s</td></tr>
+            <tr><td>خطر حرارة + ماء</td><td><span class="badge-sm bg-rd">🔴 أحمر</span></td><td>مضخة ON</td><td>2s</td></tr>
+            <tr><td>خطر حرارة + لا ماء</td><td><span class="badge-sm bg-rd">🔴 أحمر</span></td><td>مروحة ON</td><td>2s</td></tr>
+            <tr><td>خطر غاز</td><td><span class="badge-sm bg-rd">🔴 أحمر</span></td><td>مروحة تهوية</td><td>2s</td></tr>
+            <tr><td>تسرب ماء</td><td><span class="badge-sm bg-rd">🔴 أحمر</span></td><td>OFF</td><td>2s</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ══ DASHBOARD ══ -->
+<div id="dashboard">
+<div class="dash-inner">
+  <div class="dash-title-row">
+    <div>
+      <div class="sec-badge">📊 Dashboard</div>
+      <h2 class="sec-title" style="margin-bottom:0">لوحة التحكم الحية</h2>
+    </div>
+    <div class="dash-live"><div class="live-dot"></div>محاكاة مباشرة</div>
+  </div>
+
+  <div class="scenario-bar">
+    <button class="sc-btn active" onclick="setS('normal',this)">🟢 عادي</button>
+    <button class="sc-btn" onclick="setS('tempwarn',this)">🔵 تحذير حرارة + ماء</button>
+    <button class="sc-btn" onclick="setS('tempdanger',this)">🔴 خطر حرارة + ماء</button>
+    <button class="sc-btn" onclick="setS('nowater',this)">💧 خطر حرارة بدون ماء</button>
+    <button class="sc-btn" onclick="setS('gas',this)">⚠️ خطر غاز</button>
+    <button class="sc-btn" onclick="setS('leak',this)">🚨 تسرب ماء</button>
+  </div>
+
+  <div id="status-bar" class="ok">✅ النظام يعمل — كل شيء بخير</div>
+
+  <div class="kpi-grid">
+    <div class="kpi-card" id="kpi-temp">
+      <div class="kpi-icon">🌡️</div>
+      <div class="kpi-label">TEMPERATURE · DHT22</div>
+      <div class="kpi-val ok" id="kv-temp">28.3</div>
+      <div class="kpi-unit">°C — GPIO4</div>
+    </div>
+    <div class="kpi-card" id="kpi-gas">
+      <div class="kpi-icon">💨</div>
+      <div class="kpi-label">GAS · MQ-2</div>
+      <div class="kpi-val ok" id="kv-gas">270</div>
+      <div class="kpi-unit">ADC — GPIO34</div>
+    </div>
+    <div class="kpi-card" id="kpi-pres">
+      <div class="kpi-icon">🌀</div>
+      <div class="kpi-label">PRESSURE · BMP280</div>
+      <div class="kpi-val ok" id="kv-pres">1013</div>
+      <div class="kpi-unit">hPa — P18/P19</div>
+    </div>
+    <div class="kpi-card" id="kpi-water">
+      <div class="kpi-icon">💧</div>
+      <div class="kpi-label">WATER SENSOR</div>
+      <div class="kpi-val ok" id="kv-water">متوفر</div>
+      <div class="kpi-unit">GPIO32</div>
+    </div>
+    <div class="kpi-card" id="kpi-hum">
+      <div class="kpi-icon">🌫️</div>
+      <div class="kpi-label">HUMIDITY · DHT22</div>
+      <div class="kpi-val ok" id="kv-hum">52</div>
+      <div class="kpi-unit">%RH</div>
+    </div>
+    <div class="kpi-card" id="kpi-pir">
+      <div class="kpi-icon">👁️</div>
+      <div class="kpi-label">PIR · MOTION</div>
+      <div class="kpi-val ok" id="kv-pir">No</div>
+      <div class="kpi-unit">GPIO27</div>
+    </div>
+  </div>
+
+  <div class="dash-main">
+    <!-- OLED -->
+    <div class="dash-card">
+      <div class="dash-card-title">📺 شاشة OLED</div>
+      <div class="oled-big">
+        <span class="ol" id="ol1">0:00 PIR:No</span>
+        <span class="ol" id="ol2">T:28.3C H:52%</span>
+        <span class="ol" id="ol3">Gas:270 W:OK</span>
+        <span class="ol ow" id="ol4">All Good :)</span>
+      </div>
+    </div>
+
+    <!-- RELAY -->
+    <div class="dash-card">
+      <div class="dash-card-title">⚡ التحكم بالـ Relay</div>
+      <div class="relay-controls">
+        <div class="rc-row">
+          <span class="rc-label">💧 مضخة الماء (GPIO13)</span>
+          <span class="rc-badge rc-off" id="d-pump">OFF</span>
+        </div>
+        <div class="rc-row">
+          <span class="rc-label">🌀 مروحة التبريد (GPIO12)</span>
+          <span class="rc-badge rc-off" id="d-fan">OFF</span>
+        </div>
+        <div class="rc-row">
+          <span class="rc-label">🔴 LED الأحمر (GPIO26)</span>
+          <span class="rc-badge rc-off" id="d-ledr">OFF</span>
+        </div>
+        <div class="rc-row">
+          <span class="rc-label">🔵 LED الأزرق (GPIO14)</span>
+          <span class="rc-badge rc-off" id="d-ledb">OFF</span>
+        </div>
+        <div class="rc-row">
+          <span class="rc-label">🟢 LED الأخضر (GPIO33)</span>
+          <span class="rc-badge rc-on" id="d-ledg">ON</span>
+        </div>
+        <div class="rc-row">
+          <span class="rc-label">🔔 Buzzer (GPIO25)</span>
+          <span class="rc-badge rc-off" id="d-buz">OFF</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- TELEGRAM LOG -->
+    <div class="dash-card">
+      <div class="dash-card-title">📱 سجل Telegram</div>
+      <div class="tg-log" id="tg-log">
+        <div class="tg-msg">
+          <div class="tg-time">00:00:01</div>
+          <div class="tg-type" style="color:var(--gn)">✅ System Online</div>
+          Smart Thermal Guardian بدأ العمل
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TEMP HISTORY CHART -->
+  <div class="dash-card" style="margin-top:14px;">
+    <div class="dash-card-title">📈 سجل درجات الحرارة (آخر 14 قراءة)</div>
+    <div class="mini-chart" id="temp-chart"></div>
+    <div style="display:flex;justify-content:space-between;font-size:.62rem;color:var(--gray);margin-top:4px;">
+      <span>أقدم</span><span>الحد الأزرق: 25°C</span><span>الحد الأحمر: 30°C</span><span>الآن</span>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ══ SPECS ══ -->
+<section id="specs">
+  <div class="sec-badge">🔧 المواصفات</div>
+  <h2 class="sec-title">المكونات التقنية الكاملة</h2>
+  <p class="sec-sub">20 مكوناً متكاملاً بتكلفة إجمالية ~7,800 DZD — 10 إلى 20 مرة أرخص من الأنظمة المستوردة.</p>
+  <div class="specs-grid fade-in">
+    <div class="spec-card">
+      <div class="spec-card-title">وحدة التحكم الرئيسية</div>
+      <div class="spec-row"><span class="spec-key">المتحكم</span><span class="spec-val cy">ESP32-S NodeMCU 38-pin</span></div>
+      <div class="spec-row"><span class="spec-key">المعالج</span><span class="spec-val">Dual-Core 240MHz LX6</span></div>
+      <div class="spec-row"><span class="spec-key">WiFi</span><span class="spec-val cy">802.11 b/g/n 2.4GHz</span></div>
+      <div class="spec-row"><span class="spec-key">Flash</span><span class="spec-val">4MB — Huge APP Partition</span></div>
+      <div class="spec-row"><span class="spec-key">التنبيه البعيد</span><span class="spec-val cy">Telegram Bot API</span></div>
+      <div class="spec-row"><span class="spec-key">دورة القراءة</span><span class="spec-val gn">كل 2 ثانية</span></div>
+      <div class="spec-row"><span class="spec-key">وقت التنبيه</span><span class="spec-val gn">أقل من 100ms</span></div>
+    </div>
+    <div class="spec-card">
+      <div class="spec-card-title">المستشعرات</div>
+      <div class="spec-row"><span class="spec-key">DHT22</span><span class="spec-val cy">GPIO4 | -40→80°C ±0.5°C</span></div>
+      <div class="spec-row"><span class="spec-key">BMP280</span><span class="spec-val cy">P18/P19 | 300-1100 hPa</span></div>
+      <div class="spec-row"><span class="spec-key">MQ-2</span><span class="spec-val cy">GPIO34 | LPG/Smoke/H₂</span></div>
+      <div class="spec-row"><span class="spec-key">PIR HC-SR501</span><span class="spec-val cy">GPIO27 | 7م 120°</span></div>
+      <div class="spec-row"><span class="spec-key">Water Sensor</span><span class="spec-val cy">GPIO32 | ADC 12-bit</span></div>
+      <div class="spec-row"><span class="spec-key">OLED SSD1306</span><span class="spec-val cy">P21/P22 | 128×64px</span></div>
+    </div>
+    <div class="spec-card">
+      <div class="spec-card-title">نظام التبريد</div>
+      <div class="spec-row"><span class="spec-key">Relay مضخة</span><span class="spec-val cy">GPIO13 | LOW=ON</span></div>
+      <div class="spec-row"><span class="spec-key">Relay مروحة</span><span class="spec-val cy">GPIO12 | LOW=ON</span></div>
+      <div class="spec-row"><span class="spec-key">المضخة</span><span class="spec-val">Mini DC 5V 120L/h</span></div>
+      <div class="spec-row"><span class="spec-key">المروحة</span><span class="spec-val">CPU 12V 92×92mm</span></div>
+      <div class="spec-row"><span class="spec-key">الإسفنج</span><span class="spec-val">100×100×30mm مسامي</span></div>
+      <div class="spec-row"><span class="spec-key">تخفيض الحرارة</span><span class="spec-val gn">8 – 15°C بالتبخر</span></div>
+    </div>
+    <div class="spec-card">
+      <div class="spec-card-title">حدود التنبيه</div>
+      <div class="spec-row"><span class="spec-key">تحذير حرارة</span><span class="spec-val or">≥ 25°C</span></div>
+      <div class="spec-row"><span class="spec-key">خطر حرارة</span><span class="spec-val" style="color:var(--rd)">≥ 30°C</span></div>
+      <div class="spec-row"><span class="spec-key">تحذير غاز</span><span class="spec-val or">≥ 1500 ADC</span></div>
+      <div class="spec-row"><span class="spec-key">خطر غاز</span><span class="spec-val" style="color:var(--rd)">≥ 2500 ADC</span></div>
+      <div class="spec-row"><span class="spec-key">مستوى الماء</span><span class="spec-val cy">≥ 1000 ADC = متوفر</span></div>
+      <div class="spec-row"><span class="spec-key">Telegram (خطر)</span><span class="spec-val" style="color:var(--rd)">كل 2 ثانية</span></div>
+      <div class="spec-row"><span class="spec-key">Telegram (تحذير)</span><span class="spec-val or">كل 60 ثانية</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ MARKET ══ -->
+<section id="market" style="background:var(--bg2); max-width:100%; padding:80px 0;">
+<div style="max-width:1100px; margin:0 auto; padding:0 28px;">
+  <div class="sec-badge">📈 السوق</div>
+  <h2 class="sec-title">السوق الجزائري غير المستغَل</h2>
+  <p class="sec-sub">لا يوجد منافس محلي — نحن الأول في هذا القطاع بأسعار في متناول الجميع.</p>
+  <div class="market-grid fade-in">
+    <div class="mkt-card">
+      <div class="mkt-num" style="color:var(--or)">3,000+</div>
+      <div class="mkt-label">نقطة توزيع نفطال</div>
+      <div class="mkt-sub">45 مليون DZD</div>
+    </div>
+    <div class="mkt-card">
+      <div class="mkt-num" style="color:var(--cyan)">500+</div>
+      <div class="mkt-label">منشأة تخزين صناعي</div>
+      <div class="mkt-sub">7.5 مليون DZD</div>
+    </div>
+    <div class="mkt-card">
+      <div class="mkt-num" style="color:var(--lblue)">200+</div>
+      <div class="mkt-label">مواقع ENAGEO/Sonatrach</div>
+      <div class="mkt-sub">4 مليون DZD</div>
+    </div>
+    <div class="mkt-card">
+      <div class="mkt-num" style="color:var(--gn)">1,000+</div>
+      <div class="mkt-label">مستودعات PME</div>
+      <div class="mkt-sub">10 مليون DZD</div>
+    </div>
+    <div class="mkt-card" style="border-color:rgba(0,200,255,.2);">
+      <div class="mkt-num" style="color:var(--cyan)">66.5M</div>
+      <div class="mkt-label">DZD — إجمالي السوق TAM</div>
+      <div class="mkt-sub">4,700+ وحدة</div>
+    </div>
+  </div>
+
+  <div style="background:var(--panel);border:1px solid rgba(255,255,255,.06);border-radius:var(--r);padding:24px;margin-top:20px;">
+    <div style="font-size:.72rem;color:var(--cyan);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:20px;">📊 التوقعات المالية 3 سنوات</div>
+    <div style="display:flex;gap:20px;margin-bottom:10px;font-size:.68rem;color:var(--gray);">
+      <span style="display:flex;align-items:center;gap:4px;"><span style="display:inline-block;width:10px;height:10px;background:linear-gradient(90deg,var(--lblue),var(--cyan));border-radius:2px;"></span>الإيرادات</span>
+      <span style="display:flex;align-items:center;gap:4px;"><span style="display:inline-block;width:10px;height:10px;background:linear-gradient(90deg,var(--gn),#40F080);border-radius:2px;"></span>الربح الصافي</span>
+    </div>
+    <div class="fin-grid">
+      <div class="fin-row">
+        <span class="fin-year">Y1</span>
+        <div class="fin-bar-wrap">
+          <div class="fin-bar rev" style="width:25%"></div>
+        </div>
+        <span class="fin-val">800K DZD</span>
+      </div>
+      <div class="fin-row">
+        <span class="fin-year">Y1</span>
+        <div class="fin-bar-wrap">
+          <div class="fin-bar net" style="width:0.3%;opacity:.5"></div>
+        </div>
+        <span class="fin-val" style="color:var(--rd)">-10K DZD</span>
+      </div>
+      <div class="fin-row">
+        <span class="fin-year">Y2</span>
+        <div class="fin-bar-wrap">
+          <div class="fin-bar rev" style="width:56%"></div>
+        </div>
+        <span class="fin-val">1.8M DZD</span>
+      </div>
+      <div class="fin-row">
+        <span class="fin-year">Y2</span>
+        <div class="fin-bar-wrap">
+          <div class="fin-bar net" style="width:11%"></div>
+        </div>
+        <span class="fin-val">365K DZD</span>
+      </div>
+      <div class="fin-row">
+        <span class="fin-year">Y3</span>
+        <div class="fin-bar-wrap">
+          <div class="fin-bar rev" style="width:100%"></div>
+        </div>
+        <span class="fin-val">3.2M DZD</span>
+      </div>
+      <div class="fin-row">
+        <span class="fin-year">Y3</span>
+        <div class="fin-bar-wrap">
+          <div class="fin-bar net" style="width:31%"></div>
+        </div>
+        <span class="fin-val">1M DZD</span>
+      </div>
+    </div>
+    <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:18px;">
+      <div style="background:rgba(22,163,74,.08);border:1px solid rgba(22,163,74,.2);border-radius:8px;padding:8px 14px;font-size:.75rem;color:var(--gn);">Break-even: السنة 2</div>
+      <div style="background:rgba(0,200,255,.08);border:1px solid rgba(0,200,255,.2);border-radius:8px;padding:8px 14px;font-size:.75rem;color:var(--cyan);">هامش ربح: 48–61%</div>
+      <div style="background:rgba(16,58,110,.3);border:1px solid rgba(0,200,255,.15);border-radius:8px;padding:8px 14px;font-size:.75rem;color:var(--lgray);">استثمار أولي: 760K DZD</div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ══ CONTACT ══ -->
+<div id="contact">
+<div class="contact-inner">
+  <div class="sec-badge">📞 تواصل معنا</div>
+  <h2 class="sec-title">ابدأ شراكتك مع Smart Thermal Guardian</h2>
+  <p class="sec-sub">نرحب بشركاء من نفطال، ENAGEO، Sonatrach والمستثمرين في قطاع الأمان الصناعي.</p>
+  <div class="contact-grid fade-in">
+    <div class="contact-info">
+      <div class="ci-item">
+        <span class="ci-icon">👨‍🎓</span>
+        <div>
+          <div class="ci-label">المؤسس</div>
+          <div class="ci-val">BOUROUGAA Oussama</div>
+        </div>
+      </div>
+      <div class="ci-item">
+        <span class="ci-icon">🏛️</span>
+        <div>
+          <div class="ci-label">الجامعة</div>
+          <div class="ci-val">جامعة الشهيد الشيخ العربي التبسي — تبسة</div>
+        </div>
+      </div>
+      <div class="ci-item">
+        <span class="ci-icon">🎓</span>
+        <div>
+          <div class="ci-label">التخصص</div>
+          <div class="ci-val">هندسة كهروميكانيكية — 2025/2026</div>
+        </div>
+      </div>
+      <div class="ci-item">
+        <span class="ci-icon">👨‍🏫</span>
+        <div>
+          <div class="ci-label">المشرف الرئيسي</div>
+          <div class="ci-val">د. عطية موسى</div>
+        </div>
+      </div>
+      <div class="ci-item">
+        <span class="ci-icon">👨‍🏫</span>
+        <div>
+          <div class="ci-label">المشرف المشارك</div>
+          <div class="ci-val">د. عمارة عبد الرزاق</div>
+        </div>
+      </div>
+      <div class="ci-item">
+        <span class="ci-icon">🚀</span>
+        <div>
+          <div class="ci-label">الإطار القانوني</div>
+          <div class="ci-val">مرسوم وزاري N°008 — Startup Académique</div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <form class="contact-form" onsubmit="submitForm(event)">
+        <div class="form-group">
+          <label class="form-label">الاسم الكامل</label>
+          <input class="form-input" type="text" placeholder="اسمك الكامل" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">البريد الإلكتروني</label>
+          <input class="form-input" type="email" placeholder="email@example.com" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">الشركة / المؤسسة</label>
+          <input class="form-input" type="text" placeholder="نفطال، ENAGEO، مستثمر...">
+        </div>
+        <div class="form-group">
+          <label class="form-label">رسالتك</label>
+          <textarea class="form-textarea" placeholder="اكتب رسالتك هنا..." required></textarea>
+        </div>
+        <button type="submit" class="form-submit">إرسال الرسالة 📨</button>
+      </form>
+      <div id="form-success" style="display:none;background:rgba(22,163,74,.08);border:1px solid rgba(22,163,74,.2);border-radius:var(--r);padding:16px;margin-top:12px;color:var(--gn);font-size:.85rem;">
+        ✅ تم إرسال رسالتك بنجاح! سنتواصل معك قريباً.
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ══ FOOTER ══ -->
+<footer>
+  <div class="footer-logo">PYRO<span>SENSOR</span></div>
+  <div class="footer-sub">Intelligent Fuel Safety Systems — Tebessa, Algeria</div>
+  <div class="footer-links">
+    <a href="#hero">الرئيسية</a>
+    <a href="#problems">المشكلة</a>
+    <a href="#solution">الحل</a>
+    <a href="#dashboard">Dashboard</a>
+    <a href="#specs">المواصفات</a>
+    <a href="#market">السوق</a>
+    <a href="#contact">تواصل</a>
+  </div>
+  <div class="footer-copy">© 2026 Smart Thermal Guardian · Smart Thermal Guardian · BOUROUGAA Oussama · جامعة تبسة</div>
+</footer>
+
+<script>
+// ══ MOBILE MENU ══
+function toggleMenu(){
+  const m=document.getElementById('mmenu');
+  m.style.display=m.style.display==='flex'?'none':'flex';
+}
+function closeMenu(){ document.getElementById('mmenu').style.display='none'; }
+
+// ══ SCROLL ANIMATIONS ══
+const obs=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{ if(e.isIntersecting) e.target.classList.add('visible'); });
+},{threshold:.1});
+document.querySelectorAll('.fade-in').forEach(el=>obs.observe(el));
+
+// ══ NAV ACTIVE ══
+window.addEventListener('scroll',()=>{
+  const sections=['hero','problems','solution','dashboard','specs','market','contact'];
+  let current='';
+  sections.forEach(id=>{
+    const el=document.getElementById(id);
+    if(el && window.scrollY>=el.offsetTop-100) current=id;
+  });
+  document.querySelectorAll('.nav-links a').forEach(a=>{
+    a.classList.remove('active');
+    if(a.getAttribute('href')==='#'+current) a.classList.add('active');
+  });
+});
+
+// ══ DASHBOARD LOGIC ══
+let scenario='normal';
+let frameCount=0;
+const tempHistory=Array(14).fill(28);
+
+function setS(s,el){
+  scenario=s;
+  document.querySelectorAll('.sc-btn').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+}
+
+function rnd(v,n=0.3){ return v+(Math.random()-.5)*n; }
+
+function badge(el,on){
+  el.textContent=on?'ON':'OFF';
+  el.className='rc-badge '+(on?'rc-on':'rc-off');
+}
+function kpiClass(val,w,d){
+  return val>=d?'danger':val>=w?'warn':'ok';
+}
+
+let tgCount=0;
+const tgLog=document.getElementById('tg-log');
+function addTg(type,msg,col){
+  tgCount++;
+  const mins=Math.floor(frameCount/30);
+  const secs=frameCount%30;
+  const time=`${String(mins).padStart(2,'0')}:${String(secs).padStart(2,'0')}`;
+  const div=document.createElement('div');
+  div.className='tg-msg';
+  div.innerHTML=`<div class="tg-time">${time}</div><div class="tg-type" style="color:${col}">${type}</div>${msg}`;
+  tgLog.insertBefore(div,tgLog.firstChild);
+  if(tgLog.children.length>8) tgLog.removeChild(tgLog.lastChild);
+}
+
+function updateChart(){
+  const chart=document.getElementById('temp-chart');
+  chart.innerHTML='';
+  const max=Math.max(...tempHistory,35);
+  const min=Math.min(...tempHistory,20);
+  tempHistory.forEach(v=>{
+    const pct=((v-min)/(max-min||1)*80+10);
+    const col=v>=30?'var(--rd)':v>=25?'var(--or)':'var(--cyan)';
+    const bar=document.createElement('div');
+    bar.className='mini-bar';
+    bar.style.height=pct+'%';
+    bar.style.background=`linear-gradient(0deg,${col}88,${col})`;
+    chart.appendChild(bar);
+  });
+}
+
+function update(){
+  let temp,gas,water,pir,pump,fan,ledR,ledG,ledB,buz,status,statusClass;
+  const n=.4;
+  switch(scenario){
+    case 'normal':
+      temp=rnd(28,n); gas=rnd(270,30); water='متوفر'; pir=false;
+      pump=false; fan=false; ledR=false; ledG=true; ledB=false; buz=false;
+      status='✅ النظام يعمل — كل شيء بخير'; statusClass='ok'; break;
+    case 'tempwarn':
+      temp=rnd(27,n); gas=rnd(200,20); water='متوفر'; pir=false;
+      pump=true; fan=false; ledR=false; ledG=false; ledB=true; buz=true;
+      status='🔵 تحذير: حرارة مرتفعة — المضخة تعمل (ماء متوفر)'; statusClass='warn';
+      if(frameCount%180===0) addTg('⚠️ Temp Warning','T:'+temp.toFixed(1)+'C | Pump: ON','var(--or)'); break;
+    case 'tempdanger':
+      temp=rnd(33,n); gas=rnd(300,30); water='متوفر'; pir=false;
+      pump=true; fan=false; ledR=true; ledG=false; ledB=false; buz=true;
+      status='🔴 خطر: حرارة عالية جداً — المضخة تعمل بكامل طاقتها'; statusClass='danger';
+      if(frameCount%60===0) addTg('🚨 TEMP DANGER','T:'+temp.toFixed(1)+'C | Pump: ON','var(--rd)'); break;
+    case 'nowater':
+      temp=rnd(32,n); gas=rnd(250,20); water='فارغ'; pir=false;
+      pump=false; fan=true; ledR=true; ledG=false; ledB=false; buz=true;
+      status='🌀 خطر: لا ماء — المروحة + الإسفنج يعملان للتبريد'; statusClass='danger';
+      if(frameCount%60===0) addTg('🚨 DANGER (No Water)','T:'+temp.toFixed(1)+'C | Fan+Sponge: ON','var(--rd)'); break;
+    case 'gas':
+      temp=rnd(29,n); gas=rnd(2900,200); water='متوفر'; pir=true;
+      pump=false; fan=true; ledR=true; ledG=false; ledB=false; buz=true;
+      status='🚨 خطر غاز! — المروحة تعمل للتهوية + تنبيه Telegram فوري'; statusClass='danger';
+      if(frameCount%60===0) addTg('💥 GAS DANGER','Gas:'+Math.round(gas)+' | Fan: ON (ventilation)','var(--rd)'); break;
+    case 'leak':
+      temp=rnd(28,n); gas=rnd(220,20); water='تسرب!'; pir=false;
+      pump=false; fan=false; ledR=true; ledG=false; ledB=false; buz=true;
+      status='💧 تسرب ماء مكتشف! — تنبيه فوري أُرسل لكلا الهاتفين'; statusClass='danger';
+      if(frameCount%60===0) addTg('💧 WATER LEAK','Water sensor triggered!','var(--rd)'); break;
+  }
+
+  const t=temp.toFixed(1);
+  const g=Math.round(gas);
+  const h=Math.round(rnd(52,5));
+  const p=Math.round(rnd(1013,3));
+  const mins=Math.floor(frameCount/30);
+  const secs=frameCount%30;
+
+  // status bar
+  const sb=document.getElementById('status-bar');
+  sb.textContent=status; sb.className=statusClass;
+
+  // KPIs
+  document.getElementById('kv-temp').textContent=t;
+  document.getElementById('kv-temp').className='kpi-val '+kpiClass(+t,25,30);
+  document.getElementById('kpi-temp').className='kpi-card '+(+t>=30?'alert':+t>=25?'warn':'');
+  document.getElementById('kv-gas').textContent=g;
+  document.getElementById('kv-gas').className='kpi-val '+kpiClass(g,1500,2500);
+  document.getElementById('kpi-gas').className='kpi-card '+(g>=2500?'alert':g>=1500?'warn':'');
+  document.getElementById('kv-water').textContent=water;
+  document.getElementById('kv-water').className='kpi-val '+(water==='متوفر'?'ok':'danger');
+  document.getElementById('kpi-water').className='kpi-card '+(water!=='متوفر'?'alert':'');
+  document.getElementById('kv-pres').textContent=p;
+  document.getElementById('kv-hum').textContent=h;
+  document.getElementById('kv-pir').textContent=pir?'YES':'No';
+  document.getElementById('kv-pir').className='kpi-val '+(pir?'warn':'ok');
+
+  // OLED
+  document.getElementById('ol1').textContent=`${mins}:${secs<10?'0':''}${secs} PIR:${pir?'YES':'No'}`;
+  document.getElementById('ol2').textContent=`T:${t}C H:${h}%`;
+  document.getElementById('ol3').textContent=`Gas:${g} W:${water==='متوفر'?'OK':'!'}`;
+  const ol4=document.getElementById('ol4');
+  ol4.textContent=status.replace(/[✅🔵🔴🌀🚨💧]/g,'').trim().substring(0,20);
+  ol4.className='ol ow';
+
+  // relay badges
+  badge(document.getElementById('d-pump'),pump);
+  badge(document.getElementById('d-fan'),fan);
+  badge(document.getElementById('d-ledr'),ledR);
+  badge(document.getElementById('d-ledb'),ledB);
+  badge(document.getElementById('d-ledg'),ledG);
+  badge(document.getElementById('d-buz'),buz);
+
+  // hero mockup
+  document.getElementById('h-ol1').textContent=`${mins}:${secs<10?'0':''}${secs} PIR:${pir?'YES':'No'}`;
+  document.getElementById('h-ol2').textContent=`T:${t}C H:${h}%`;
+  document.getElementById('h-ol3').textContent=`Gas:${g} W:${water==='متوفر'?'OK':'!'}`;
+  document.getElementById('h-ol4').textContent=scenario==='normal'?'All Good :)':statusClass==='danger'?'!!! DANGER !!!':'! WARNING !';
+  document.getElementById('h-temp').textContent=t+'°C';
+  document.getElementById('h-temp').className='smg-val '+kpiClass(+t,25,30);
+  document.getElementById('h-gas').textContent=g;
+  document.getElementById('h-gas').className='smg-val '+kpiClass(g,1500,2500);
+  document.getElementById('h-water').textContent=water;
+  document.getElementById('h-water').className='smg-val '+(water==='متوفر'?'ok':'danger');
+  document.getElementById('h-pres').textContent=p+' hPa';
+  document.getElementById('h-pump').textContent='💧 مضخة '+(pump?'ON':'OFF');
+  document.getElementById('h-pump').className='relay-pill '+(pump?'on':'off');
+  document.getElementById('h-fan').textContent='🌀 مروحة '+(fan?'ON':'OFF');
+  document.getElementById('h-fan').className='relay-pill '+(fan?'on':'off');
+
+  // temp history chart
+  tempHistory.shift(); tempHistory.push(+t);
+  updateChart();
+
+  frameCount++;
+}
+
+// ══ FORM ══
+function submitForm(e){
+  e.preventDefault();
+  const name    = e.target.querySelector('input[type=text]').value;
+  const email   = e.target.querySelector('input[type=email]').value;
+  const company = e.target.querySelectorAll('input[type=text]')[1]?.value || '';
+  const msg     = e.target.querySelector('textarea').value;
+  const subject = encodeURIComponent('Smart Thermal Guardian — رسالة من ' + name);
+  const body    = encodeURIComponent(
+    'الاسم: ' + name + '\n' +
+    'البريد: ' + email + '\n' +
+    'الشركة: ' + company + '\n\n' +
+    'الرسالة:\n' + msg
+  );
+  window.location.href = 'mailto:oussamabour777@gmail.com?subject=' + subject + '&body=' + body;
+  document.getElementById('form-success').style.display='block';
+  e.target.style.display='none';
+}
+
+// ══ INIT ══
+setInterval(update, 2000);
+update();
+updateChart();
+</script>
+</body>
+</html>
